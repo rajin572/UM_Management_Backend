@@ -1,92 +1,43 @@
-import { Request, Response } from 'express';
 import { StudentService } from './student.services';
-import studentValidationSchema from './student.validation';
-// import studentValidationSchema from './student.joi.validation';
+import sendResponse from '../../../utils/sendResponse';
+import httpStatus from 'http-status';
+import catchAsync from '../../../utils/catchAsync';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const createUserController = async (req: Request, res: Response) => {
-  try {
-    const studentData = await req.body;
-    //Joi Validation Data
-    // const { error, value } = studentValidationSchema.validate(studentData);
+const getUserController = catchAsync(async (req, res) => {
+  const result = await StudentService.getUserService();
 
-    //Zod validation data
-    const zodParseData = studentValidationSchema.parse(studentData);
-    const result = await StudentService.createUserService(zodParseData);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Get All Student succesfull',
+    data: result,
+  });
+});
 
-    res.status(200).json({
-      success: true,
-      message: 'Student is created succesfully',
-      result: result,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Student is created unsuccesfull',
-      error: error,
-    });
-  }
-};
+const getUserByIDController = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await StudentService.getUserByIDService(id);
 
-const getUserController = async (req: Request, res: Response) => {
-  try {
-    const result = await StudentService.getUserService();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Get Student Data succesfully',
+    success: true,
+    data: result,
+  });
+});
 
-    res.status(200).json({
-      success: true,
-      message: 'Get All Student succesfull',
-      count: result.length,
-      result: result,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Get All Student unsuccesfull',
-      error: error,
-    });
-  }
-};
+const DeleteUserByIDController = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await StudentService.DeleteUserByIDService(id);
 
-const getUserByIDController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const result = await StudentService.getUserByIDService(id);
-
-    res.status(200).json({
-      success: true,
-      message: 'Get Student Data succesfully',
-      result: result,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Get All Student unsuccesfull',
-      error: error,
-    });
-  }
-};
-
-const DeleteUserByIDController = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const result = await StudentService.DeleteUserByIDService(id);
-
-    res.status(200).json({
-      success: true,
-      message: 'Get Student Data succesfully',
-      result: result,
-    });
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message || 'Get All Student unsuccesfull',
-      error: error,
-    });
-  }
-};
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: result,
+  });
+});
 
 export const StudentController = {
-  createUserController,
   getUserController,
   getUserByIDController,
   DeleteUserByIDController,
